@@ -1,35 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import { Channel } from "./types";
+import { addChannel, getChannels } from "./channelApi";
+import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+
+const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 300,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+    textAlign: "center",
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [channels, setChannels] = useState<null | Channel[]>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [name, setName] = useState<string>();
+    const [number, setNumber] = useState<string>();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(() => {
+        const loadData = async (): Promise<void> => {
+            const data = await getChannels();
+
+            setChannels(data);
+        };
+
+        loadData();
+    }, []);
+
+    if (!channels) {
+        return <>Wczytywanie danych...</>;
+    }
+
+    return (
+        <div>
+            <Button variant="contained" onClick={() => setIsOpen(true)}>
+                Dodaj kanał
+            </Button>
+            {isOpen && (
+                <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+                    <Box sx={modalStyle}>
+                        <Typography variant="h4" component="h2">
+                            Kanał
+                        </Typography>
+                        <Box>
+                            <TextField
+                                sx={{
+                                    my: 2,
+                                }}
+                                id="outlined-basic"
+                                label="Nazwa"
+                                variant="outlined"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <TextField
+                                sx={{
+                                    my: 2,
+                                }}
+                                id="outlined-basic-2"
+                                label="Ilość"
+                                variant="outlined"
+                                type="number"
+                                slotProps={{
+                                    inputLabel: {
+                                        shrink: true,
+                                    },
+                                }}
+                                value={number}
+                                onChange={(e) => setNumber(e.target.value)}
+                            />
+                        </Box>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={() => addChannel(name, number)}
+                        >
+                            Dodaj
+                        </Button>
+                    </Box>
+                </Modal>
+            )}
+        </div>
+    );
 }
 
-export default App
+export default App;
