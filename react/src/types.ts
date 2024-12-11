@@ -1,9 +1,14 @@
 export interface Channel {
     id: number;
     name: string;
-    number: number;
+    number: string;
     created_at: string;
     updated_at: string;
+}
+
+export interface ChartData {
+    label: string;
+    value: number;
 }
 
 export interface Response {

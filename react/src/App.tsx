@@ -1,17 +1,27 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Channel } from "./types";
+import { Channel, ChartData } from "./types";
 import { addChannel, getChannels } from "./channelApi";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import SortedTable from "./components/SortedTable";
 import { modalStyle } from "./styles";
+import { pieArcLabelClasses, PieChart } from "@mui/x-charts/PieChart";
 
 function App() {
     const [channels, setChannels] = useState<null | Channel[]>(null);
+    const [chartValue, setChartValue] = useState<null | ChartData[]>(null);
     const [reload, setReload] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [name, setName] = useState<string>("");
     const [number, setNumber] = useState<string>("");
+
+    const mobile: boolean = window.innerWidth < 600;
+
+    const size = {
+        width: mobile ? window.innerWidth : 600,
+        height: mobile ? window.innerWidth * 1.4 : 300,
+    };
 
     useEffect(() => {
         const loadData = async (): Promise<void> => {
@@ -26,6 +36,22 @@ function App() {
             loadData();
         }
     }, [reload]);
+
+    useEffect(() => {
+        if (channels) {
+            const total = channels.reduce(
+                (sum, item) => sum + parseInt(item.number),
+                0
+            );
+            setChartValue(
+                channels.map((item) => ({
+                    label: item.name,
+                    value:
+                        total > 0 ? (parseInt(item.number) / total) * 100 : 0,
+                }))
+            );
+        }
+    }, [channels]);
 
     const reloadChannels = (): void => {
         setReload(true);
@@ -44,16 +70,66 @@ function App() {
         } catch (error) {}
     };
 
-    if (!channels) {
+    if (!channels || !chartValue) {
         return <>Wczytywanie danych...</>;
     }
 
     return (
         <div>
-            <SortedTable rows={channels} reloadChannels={reloadChannels} />
-            <Button variant="contained" onClick={() => setIsOpen(true)}>
-                Dodaj kanał
-            </Button>
+            <Grid
+                container
+                gap={2}
+                sx={{
+                    justifyContent: "center",
+                    mt: 6,
+                }}
+            >
+                <div style={{ flexGrow: 0 }}>
+                    <SortedTable
+                        rows={channels}
+                        reloadChannels={reloadChannels}
+                    />
+                    <div style={{ textAlign: "center" }}>
+                        <Button
+                            variant="contained"
+                            onClick={() => setIsOpen(true)}
+                            sx={{ mt: 2 }}
+                        >
+                            Dodaj kanał
+                        </Button>
+                    </div>
+                </div>
+                <div style={{ flexGrow: 0 }}>
+                    <PieChart
+                        series={[
+                            {
+                                arcLabel: (item) => `${item.value.toFixed(2)}%`,
+                                arcLabelMinAngle: 30,
+                                arcLabelRadius: "60%",
+                                data: chartValue,
+                                valueFormatter: (item: { value: number }) =>
+                                    `${item.value.toFixed(2)}%`,
+                                cx: mobile ? window.innerWidth / 2 : "50%",
+                            },
+                        ]}
+                        sx={{
+                            [`& .${pieArcLabelClasses.root}`]: {
+                                fontWeight: "bold",
+                            },
+                        }}
+                        slotProps={{
+                            legend: {
+                                direction: mobile ? "row" : "column",
+                                position: {
+                                    vertical: mobile ? "bottom" : "middle",
+                                    horizontal: mobile ? "middle" : "right",
+                                },
+                            },
+                        }}
+                        {...size}
+                    ></PieChart>
+                </div>
+            </Grid>
             {isOpen && (
                 <Modal open={isOpen} onClose={() => setIsOpen(false)}>
                     <Box sx={modalStyle}>

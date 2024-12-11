@@ -233,6 +233,9 @@ export default function SortedTable({
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+        event.stopPropagation();
+        event.nativeEvent.stopImmediatePropagation();
+
         const selectedIndex = selected.indexOf(id);
         let newSelected: number[] = [];
 
@@ -289,7 +292,7 @@ export default function SortedTable({
     );
 
     return (
-        <Box sx={{ width: "fit-content", m: "auto", mt: 4 }}>
+        <Box sx={{ width: "fit-content", m: "auto" }}>
             <Paper sx={{ width: "100%", mb: 2 }}>
                 <EnhancedTableToolbar
                     numSelected={selected.length}
