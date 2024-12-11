@@ -30,7 +30,7 @@ import {
     Order,
     SortedTableProps,
 } from "../types";
-import { deleteChannels } from "../channelApi";
+import { deleteChannels, editChannel } from "../channelApi";
 import { modalStyle } from "../styles";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -202,7 +202,7 @@ export default function SortedTable({
     const [order, setOrder] = useState<Order>("asc");
     const [orderBy, setOrderBy] = useState<keyof Channel>("name");
     const [selected, setSelected] = useState<number[]>([]);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [openChannel, setOpenChannel] = useState<Channel | null>(null);
     const [page, setPage] = useState<number>(0);
     const [modalName, setModalName] = useState<string>("");
     const [modalNumber, setModalNumber] = useState<string>("");
@@ -252,12 +252,26 @@ export default function SortedTable({
     };
 
     const openModal = (channel: Channel): void => {
-        setIsOpen(true);
+        setOpenChannel(channel);
         setModalName(channel.name);
         setModalNumber(channel.number.toString());
     };
 
-    const clickEditChannel = (): void => {};
+    const clickEditChannel = async (): Promise<void> => {
+        try {
+            if (openChannel) {
+                const response = await editChannel(
+                    openChannel.id.toString(),
+                    modalName,
+                    modalNumber
+                );
+
+                if ((response.id, response.name, response.number)) {
+                    reloadChannels();
+                }
+            }
+        } catch (error) {}
+    };
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -360,8 +374,11 @@ export default function SortedTable({
                     onPageChange={handleChangePage}
                 />
             </Paper>
-            {isOpen && (
-                <Modal open={isOpen} onClose={() => setIsOpen(false)}>
+            {openChannel !== null && (
+                <Modal
+                    open={openChannel !== null}
+                    onClose={() => setOpenChannel(null)}
+                >
                     <Box sx={modalStyle}>
                         <Typography variant="h4" component="h2">
                             Edytuj kanał
