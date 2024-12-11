@@ -1,4 +1,4 @@
-import { Channel } from "./types";
+import { Channel, Response } from "./types";
 
 export async function getChannels(): Promise<Channel[]> {
     const request = await fetch("http://localhost:8000/api/channels");
@@ -7,9 +7,12 @@ export async function getChannels(): Promise<Channel[]> {
     return data;
 }
 
-export async function addChannel(name?: string, number?: string): Promise<any> {
+export async function addChannel(
+    name?: string,
+    number?: string
+): Promise<Channel> {
     if (!name || !number) {
-        return;
+        throw new Error("Brak danych.");
     }
 
     const formData = new FormData();
@@ -23,4 +26,26 @@ export async function addChannel(name?: string, number?: string): Promise<any> {
     const data: Channel = await request.json();
 
     return data;
+}
+
+export async function deleteChannels(ids: number[]): Promise<Response> {
+    if (!ids || ids.length === 0) {
+        throw new Error("Brak danych.");
+    }
+
+    const request = await fetch("http://localhost:8000/api/channels", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+    });
+
+    if (!request.ok) {
+        const error = await request.json();
+        throw new Error(error.error || "Błąd w usuwaniu danych.");
+    }
+
+    const response = await request.json();
+    return response;
 }
