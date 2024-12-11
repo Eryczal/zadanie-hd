@@ -267,6 +267,7 @@ export default function SortedTable({
                 );
 
                 if ((response.id, response.name, response.number)) {
+                    setOpenChannel(null);
                     reloadChannels();
                 }
             }
