@@ -16,3 +16,4 @@ use App\Http\Controllers\ChannelController;
 */
 
 Route::apiResource('channels', ChannelController::class);
+Route::delete('channels', [ChannelController::class, 'destroyMultiple']);

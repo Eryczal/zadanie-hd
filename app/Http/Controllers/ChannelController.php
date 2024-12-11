@@ -95,6 +95,23 @@ class ChannelController extends Controller
 
         $item->delete();
 
-        return response()->json(['message' => 'Item deleted successfully'], 204);
+        return response()->json(['message' => 'Item deleted successfully'], 200);
+    }
+
+    public function destroyMultiple(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!is_array($ids) || empty($ids)) {
+            return response()->json(['message' => 'Invalid input. Provide an array of IDs.'], 400);
+        }
+
+        $deletedCount = Channel::whereIn('id', $ids)->delete();
+
+        if ($deletedCount === 0) {
+            return response()->json(['message' => 'No matching items found.'], 404);
+        }
+
+        return response()->json(['message' => 'Items deleted successfully', 'deletedCount' => $deletedCount], 200);
     }
 }
