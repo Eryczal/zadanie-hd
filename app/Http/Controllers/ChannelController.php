@@ -77,6 +77,10 @@ class ChannelController extends Controller
             'number' => 'sometimes|required|integer',
         ]);
 
+        if (empty($validatedData)) {
+            return response()->json(['message' => 'No valid fields provided for update'], 400);
+        }
+
         $item->update($validatedData);
 
         return response()->json($item);
