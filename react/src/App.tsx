@@ -60,7 +60,7 @@ function App() {
                         <Typography variant="h4" component="h2">
                             Kanał
                         </Typography>
-                        <Box>
+                        <Box sx={{ my: 4 }}>
                             <TextField
                                 sx={{
                                     my: 2,

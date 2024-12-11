@@ -366,7 +366,7 @@ export default function SortedTable({
                         <Typography variant="h4" component="h2">
                             Edytuj kanał
                         </Typography>
-                        <Box>
+                        <Box sx={{ my: 4 }}>
                             <TextField
                                 sx={{
                                     my: 2,
