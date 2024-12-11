@@ -3,22 +3,46 @@ import "./App.css";
 import { Channel } from "./types";
 import { addChannel, getChannels } from "./channelApi";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import SortedTable from "./components/SortedTable";
+import { modalStyle } from "./styles";
 
 function App() {
     const [channels, setChannels] = useState<null | Channel[]>(null);
+    const [reload, setReload] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [name, setName] = useState<string>();
-    const [number, setNumber] = useState<string>();
+    const [name, setName] = useState<string>("");
+    const [number, setNumber] = useState<string>("");
 
     useEffect(() => {
         const loadData = async (): Promise<void> => {
             const data = await getChannels();
 
             setChannels(data);
+
+            setReload(false);
         };
 
-        loadData();
-    }, []);
+        if (reload) {
+            loadData();
+        }
+    }, [reload]);
+
+    const reloadChannels = (): void => {
+        setReload(true);
+    };
+
+    const clickAddChannel = async (): Promise<void> => {
+        try {
+            const data = await addChannel(name, number);
+
+            if ((data.id, data.name, data.number)) {
+                setChannels((oldChannels) => [...(oldChannels ?? []), data]);
+                setName("");
+                setNumber("");
+                setIsOpen(false);
+            }
+        } catch (error) {}
+    };
 
     if (!channels) {
         return <>Wczytywanie danych...</>;
@@ -26,6 +50,7 @@ function App() {
 
     return (
         <div>
+            <SortedTable rows={channels} reloadChannels={reloadChannels} />
             <Button variant="contained" onClick={() => setIsOpen(true)}>
                 Dodaj kanał
             </Button>
@@ -66,7 +91,7 @@ function App() {
                         <Button
                             variant="contained"
                             size="large"
-                            onClick={() => addChannel(name, number)}
+                            onClick={() => clickAddChannel()}
                         >
                             Dodaj
                         </Button>
