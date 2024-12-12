@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import { Channel, ChartData } from "./types";
 import { addChannel, getChannels } from "./channelApi";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
