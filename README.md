@@ -12,7 +12,7 @@ Aplikacja jest responsywna i działa na telefonach i komputerach. Wygląd strony
 
 ![Dodawanie](demo/add.gif)
 
-Dane w aplikacji można sortować klikając w tabelę. Dane mogą być sortowane rozsnąco i malejąco, po nazwie kanału lub po ilości klientów z kanału.
+Dane w aplikacji można sortować klikając w tabelę. Jest możliwość zaznaczenia wielu kanałów do usunięcia (za pomocą checkboxów). Edytowanie danych kanału odbywa się w modalu, który wyświetla się po kliknięciu w wiersz tabeli. Dane mogą być sortowane rozsnąco i malejąco, po nazwie kanału lub po ilości klientów z kanału.
 
 ![Usuwanie](demo/delete.gif)
 
